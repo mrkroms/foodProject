@@ -53,16 +53,21 @@ window.addEventListener("DOMContentLoaded", () => {
 
   // timer js
 
-  const deadline = "2023-12-18";
+  const deadline = "2023-12-16";
 
   //function betwen deadline and time now
 
   function getTimeRemaining(endtime) {
+    let days, hours, minutes, second;
     const t = Date.parse(endtime) - Date.parse(new Date());
-    const days = Math.floor(t / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((t / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((t / 1000 / 60) % 60);
-    const second = Math.floor((t / 1000) % 60);
+    if (t <= 0) {
+      (days = 0), (hours = 0), (minutes = 0), (second = 0);
+    } else {
+      days = Math.floor(t / (1000 * 60 * 60 * 24));
+      hours = Math.floor((t / (1000 * 60 * 60)) % 24);
+      minutes = Math.floor((t / 1000 / 60) % 60);
+      second = Math.floor((t / 1000) % 60);
+    }
 
     return {
       total: t,
@@ -104,4 +109,30 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
   setLock(".timer", deadline);
+});
+
+// modal window v1.0
+const modalWindow = document.querySelector(".modal");
+const btnCloseModalWindow = document.querySelector(".modal__close");
+const btnOpenModalWindow = document.querySelectorAll("button");
+
+const openModalWindow = function (e) {
+  e.preventDefault();
+  modalWindow.style.display = "block";
+};
+
+const closeModalWindow = function () {
+  modalWindow.style.display = "none";
+};
+
+btnOpenModalWindow.forEach((button) =>
+  button.addEventListener("click", openModalWindow)
+);
+
+btnCloseModalWindow.addEventListener("click", closeModalWindow);
+
+document.addEventListener("keydown", function (e) {
+  if (e.key === "Escape") {
+    closeModalWindow();
+  }
 });
