@@ -109,39 +109,55 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
   setLock(".timer", deadline);
-});
 
-// modal window v1.0
-const modalWindow = document.querySelector(".modal");
-const btnCloseModalWindow = document.querySelector(".modal__close");
-const btnOpenModalWindow = document.querySelectorAll("[data-modal]");
+  // modal window v1.0
+  const modalWindow = document.querySelector(".modal");
+  const btnCloseModalWindow = document.querySelector(".modal__close");
+  const btnOpenModalWindow = document.querySelectorAll("[data-modal]");
 
-const openModalWindow = function (e) {
-  e.preventDefault();
-  modalWindow.classList.add("show");
-  modalWindow.classList.remove("hide");
-  document.body.style.overflow = "hidden";
-};
+  const openModalWindow = function () {
+    modalWindow.classList.add("show");
+    modalWindow.classList.remove("hide");
+    document.body.style.overflow = "hidden";
+    //   clearInterval(modalTimer);
+  };
 
-const closeModalWindow = function () {
-  modalWindow.classList.add("hide");
-  modalWindow.classList.remove("show");
-  document.body.style.overflow = "";
-};
+  const closeModalWindow = function () {
+    modalWindow.classList.add("hide");
+    modalWindow.classList.remove("show");
+    document.body.style.overflow = "";
+  };
 
-btnOpenModalWindow.forEach((button) =>
-  button.addEventListener("click", openModalWindow)
-);
+  btnOpenModalWindow.forEach((button) =>
+    button.addEventListener("click", openModalWindow)
+  );
 
-btnCloseModalWindow.addEventListener("click", closeModalWindow);
-modalWindow.addEventListener("click", (e) => {
-  if (e.target === modalWindow) {
-    closeModalWindow();
+  btnCloseModalWindow.addEventListener("click", closeModalWindow);
+  modalWindow.addEventListener("click", (e) => {
+    if (e.target === modalWindow) {
+      closeModalWindow();
+    }
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && modalWindow.classList.contains("show")) {
+      closeModalWindow();
+    }
+  });
+
+  //show modalwindow after 3sec
+  // const modalTimer = setTimeout(openModalWindow, 3000);
+
+  //show modal window and page
+
+  function showModalByScroll() {
+    if (
+      window.pageYOffset + document.documentElement.clientHeight >=
+      document.documentElement.scrollHeight - 1
+    ) {
+      openModalWindow();
+      window.removeEventListener("scroll", showModalByScroll);
+    }
   }
-});
-
-document.addEventListener("keydown", function (e) {
-  if (e.key === "Escape" && modalWindow.classList.contains("show")) {
-    closeModalWindow();
-  }
+  window.addEventListener("scroll", showModalByScroll);
 });
