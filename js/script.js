@@ -114,15 +114,19 @@ window.addEventListener("DOMContentLoaded", () => {
 // modal window v1.0
 const modalWindow = document.querySelector(".modal");
 const btnCloseModalWindow = document.querySelector(".modal__close");
-const btnOpenModalWindow = document.querySelectorAll("button");
+const btnOpenModalWindow = document.querySelectorAll("[data-modal]");
 
 const openModalWindow = function (e) {
   e.preventDefault();
-  modalWindow.style.display = "block";
+  modalWindow.classList.add("show");
+  modalWindow.classList.remove("hide");
+  document.body.style.overflow = "hidden";
 };
 
 const closeModalWindow = function () {
-  modalWindow.style.display = "none";
+  modalWindow.classList.add("hide");
+  modalWindow.classList.remove("show");
+  document.body.style.overflow = "";
 };
 
 btnOpenModalWindow.forEach((button) =>
@@ -130,9 +134,14 @@ btnOpenModalWindow.forEach((button) =>
 );
 
 btnCloseModalWindow.addEventListener("click", closeModalWindow);
+modalWindow.addEventListener("click", (e) => {
+  if (e.target === modalWindow) {
+    closeModalWindow();
+  }
+});
 
 document.addEventListener("keydown", function (e) {
-  if (e.key === "Escape") {
+  if (e.key === "Escape" && modalWindow.classList.contains("show")) {
     closeModalWindow();
   }
 });
