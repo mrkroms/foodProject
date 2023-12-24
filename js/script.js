@@ -160,28 +160,33 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
   window.addEventListener("scroll", showModalByScroll);
-});
 
-// menu with class es6
+  // menu with class es6
 
-class MenuCard {
-  constructor(src, title, alt, descr, price, parentSelector) {
-    this.src = src;
-    this.title = title;
-    this.alt = alt;
-    this.descr = descr;
-    this.price = price;
-    this.parent = document.querySelector(parentSelector);
-    this.transfer = 90;
-    this.changeToRUB();
-  }
-  changeToRUB() {
-    this.price = this.price * this.transfer;
-  }
-  render() {
-    const element = document.createElement("div");
-    element.innerHTML = `
-    <div class="menu__item">
+  class MenuCard {
+    constructor(src, title, alt, descr, price, parentSelector, ...classes) {
+      this.src = src;
+      this.title = title;
+      this.alt = alt;
+      this.descr = descr;
+      this.price = price;
+      this.classes = classes;
+      this.parent = document.querySelector(parentSelector);
+      this.transfer = 90;
+      this.changeToRUB();
+    }
+    changeToRUB() {
+      this.price = this.price * this.transfer;
+    }
+    render() {
+      const element = document.createElement("div");
+      if (this.classes.length === 0) {
+        this.element = "menu__item";
+        element.classList.add(this.element);
+      } else {
+        this.classes.forEach((className) => element.classList.add(className));
+      }
+      element.innerHTML = `
             <img src=${this.src} alt=${this.alt} />
             <h3 class="menu__item-subtitle">${this.title}</h3>
             <div class="menu__item-descr">
@@ -192,35 +197,96 @@ class MenuCard {
               <div class="menu__item-cost">Цена:</div>
               <div class="menu__item-total"><span>${this.price}</span> руб/день</div>
             </div>
-          </div>
     `;
-    this.parent.append(element);
+      this.parent.append(element);
+    }
   }
-}
 
-new MenuCard(
-  "img/tabs/post.jpg",
-  'Меню "Постное"',
-  "post",
-  "это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля,овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.",
-  10,
-  ".menu .container"
-).render();
+  new MenuCard(
+    "img/tabs/vegy.jpg",
+    'Меню "Фитнес"',
+    "vegy",
+    "это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Этоабсолютно новый продукт с оптимальной ценой и высоким качеством!",
+    15,
+    ".menu .container",
+    "menu__item"
+  ).render();
 
-new MenuCard(
-  "img/tabs/elite.jpg",
-  'Меню "Премиум"',
-  "elite",
-  "мы используем не только красивый дизайн упаковки,но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!",
-  20,
-  ".menu .container"
-).render();
+  new MenuCard(
+    "img/tabs/elite.jpg",
+    'Меню "Премиум"',
+    "elite",
+    "мы используем не только красивый дизайн упаковки,но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!",
+    20,
+    ".menu .container",
+    "menu__item"
+  ).render();
 
-new MenuCard(
-  "img/tabs/vegy.jpg",
-  'Меню "Фитнес"',
-  "vegy",
-  "это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Этоабсолютно новый продукт с оптимальной ценой и высоким качеством!",
-  15,
-  ".menu .container"
-).render();
+  new MenuCard(
+    "img/tabs/post.jpg",
+    'Меню "Постное"',
+    "post",
+    "это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля,овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.",
+    10,
+    ".menu .container",
+    "menu__item"
+  ).render();
+
+  // POST request XMLHttpRequest
+
+  const forms = document.querySelectorAll("form");
+
+  forms.forEach((item) => {
+    postData(item);
+  });
+
+  const message = {
+    loading: "Загрузка",
+    success: "Спасибо! Скоро мы с вами свяжемся",
+    fail: "Что-то пошло не так...",
+  };
+
+  function postData(form) {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const statusMessage = document.createElement("div");
+      statusMessage.classList.add("status");
+      statusMessage.textContent = message.loading;
+      form.append(statusMessage);
+
+      const request = new XMLHttpRequest();
+      request.open("POST", "server.php");
+
+      request.setRequestHeader(
+        "content-type",
+        "application/json",
+        "charset=utf-8"
+      );
+      const formsData = new FormData(form);
+
+      //formDate format to json
+
+      const object = {};
+      formsData.forEach((value, key) => {
+        object[key] = value;
+      });
+      const json = JSON.stringify(object);
+
+      request.send(json);
+
+      request.addEventListener("load", () => {
+        if (request.status === 200) {
+          console.log(request.response);
+          statusMessage.textContent = message.success;
+          form.reset();
+          setTimeout(() => {
+            statusMessage.remove();
+          }, 3000);
+        } else {
+          statusMessage.textContent = message.fail;
+        }
+      });
+    });
+  }
+});
