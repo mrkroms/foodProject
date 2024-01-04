@@ -278,16 +278,18 @@ window.addEventListener("DOMContentLoaded", () => {
       //   "application/json",
       //   "charset=utf-8"
       // );
+
       // //formDate format to json
-
       const formsData = new FormData(form);
-      const object = {};
-      formsData.forEach((value, key) => {
-        object[key] = value;
-      });
 
-      postData("server.php", JSON.stringify(object))
-        .then((data) => data.text())
+      // const object = {};
+      // formsData.forEach((value, key) => {
+      //   object[key] = value;
+      // });
+
+      const json = JSON.stringify(Object.fromEntries(formsData.entries()));
+
+      postData("http://localhost:3000/requests", json)
         .then((data) => {
           console.log(data);
           showThanksModal(message.success);
