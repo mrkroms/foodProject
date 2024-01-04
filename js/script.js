@@ -237,7 +237,7 @@ window.addEventListener("DOMContentLoaded", () => {
   const forms = document.querySelectorAll("form");
 
   forms.forEach((item) => {
-    postData(item);
+    bindPostData(item);
   });
 
   const message = {
@@ -246,7 +246,18 @@ window.addEventListener("DOMContentLoaded", () => {
     fail: "Что-то пошло не так...",
   };
 
-  function postData(form) {
+  const postData = async (url, data) => {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: data,
+    });
+    return await res.json();
+  };
+
+  function bindPostData(form) {
     form.addEventListener("submit", (e) => {
       e.preventDefault();
 
@@ -259,37 +270,45 @@ window.addEventListener("DOMContentLoaded", () => {
       // form.append(statusMessage);
       form.insertAdjacentElement("afterend", statusMessage);
 
-      const request = new XMLHttpRequest();
-      request.open("POST", "server.php");
+      // const request = new XMLHttpRequest();
+      // request.open("POST", "server.php");
 
-      request.setRequestHeader(
-        "content-type",
-        "application/json",
-        "charset=utf-8"
-      );
+      // request.setRequestHeader(
+      //   "content-type",
+      //   "application/json",
+      //   "charset=utf-8"
+      // );
+      // //formDate format to json
+
       const formsData = new FormData(form);
-
-      //formDate format to json
-
       const object = {};
       formsData.forEach((value, key) => {
         object[key] = value;
       });
-      const json = JSON.stringify(object);
 
-      request.send(json);
-
-      request.addEventListener("load", () => {
-        if (request.status === 200) {
-          console.log(request.response);
+      postData("server.php", JSON.stringify(object))
+        .then((data) => data.text())
+        .then((data) => {
+          console.log(data);
           showThanksModal(message.success);
-          form.reset();
-
           statusMessage.remove();
-        } else {
-          showThanksModal(message.fail);
-        }
-      });
+        })
+        .catch(() => showThanksModal(message.fail))
+        .finally(() => {
+          form.reset();
+        });
+
+      // request.addEventListener("load", () => {
+      //   if (request.status === 200) {
+      //     console.log(request.response);
+      //     showThanksModal(message.success);
+      //     form.reset();
+
+      //     statusMessage.remove();
+      //   } else {
+      //     showThanksModal(message.fail);
+      //   }
+      // });
     });
   }
   function showThanksModal(message) {
@@ -313,4 +332,22 @@ window.addEventListener("DOMContentLoaded", () => {
       closeModalWindow();
     }, 4000);
   }
+  // fetch("https://jsonplaceholder.typicode.com/todos/1")
+  //   .then((response) => response.json())
+  //   .then((json) => console.log(json));
+
+  // // POST запрос
+  // fetch("https://jsonplaceholder.typicode.com/posts", {
+  //   method: "POST",
+  //   body: JSON.stringify({ name: "Ivan", age: 19 }),
+  //   headers: {
+  //     "Content-type": "application/json",
+  //   },
+  // })
+  //   .then((response) => response.json())
+  //   .then((json) => console.log(json));
+
+  fetch("http://localhost:3000/menu")
+    .then((data) => data.json())
+    .then((res) => console.log(res));
 });
