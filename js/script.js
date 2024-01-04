@@ -164,10 +164,10 @@ window.addEventListener("DOMContentLoaded", () => {
   // menu with class es6
 
   class MenuCard {
-    constructor(src, title, alt, descr, price, parentSelector, ...classes) {
+    constructor(src, title, altimg, descr, price, parentSelector, ...classes) {
       this.src = src;
       this.title = title;
-      this.alt = alt;
+      this.altimg = altimg;
       this.descr = descr;
       this.price = price;
       this.classes = classes;
@@ -187,7 +187,7 @@ window.addEventListener("DOMContentLoaded", () => {
         this.classes.forEach((className) => element.classList.add(className));
       }
       element.innerHTML = `
-            <img src=${this.src} alt=${this.alt} />
+            <img src=${this.src} alt=${this.altimg} />
             <h3 class="menu__item-subtitle">${this.title}</h3>
             <div class="menu__item-descr">
                ${this.title} - ${this.descr}
@@ -202,35 +202,83 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  new MenuCard(
-    "img/tabs/vegy.jpg",
-    'Меню "Фитнес"',
-    "vegy",
-    "это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Этоабсолютно новый продукт с оптимальной ценой и высоким качеством!",
-    15,
-    ".menu .container",
-    "menu__item"
-  ).render();
+  const getResource = async (url) => {
+    const res = await fetch(url);
 
-  new MenuCard(
-    "img/tabs/elite.jpg",
-    'Меню "Премиум"',
-    "elite",
-    "мы используем не только красивый дизайн упаковки,но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!",
-    20,
-    ".menu .container",
-    "menu__item"
-  ).render();
+    if (!res.ok) {
+      throw new Error(`could not fetch ${url}, ststus: ${res.ststus}`);
+    }
 
-  new MenuCard(
-    "img/tabs/post.jpg",
-    'Меню "Постное"',
-    "post",
-    "это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля,овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.",
-    10,
-    ".menu .container",
-    "menu__item"
-  ).render();
+    return await res.json();
+  };
+
+  getResource("http://localhost:3000/menu").then((data) => {
+    data.forEach(({ img, title, altimg, descr, price }) => {
+      new MenuCard(
+        img,
+        title,
+        altimg,
+        descr,
+        price,
+        ".menu .container"
+      ).render();
+    });
+  });
+
+  //creat card without constructor
+  // getResource("http://localhost:3000/menu").then((data) => {
+  //   createCard(data);
+  // });
+
+  // function createCard(data) {
+  //   data.forEach(({ img, title, altimg, descr, price }) => {
+  //     const element = document.createElement("div");
+  //     element.classList.add("menu__item");
+  //     element.innerHTML = `
+  //           <img src=${img} alt=${altimg} />
+  //           <h3 class="menu__item-subtitle">${title}</h3>
+  //           <div class="menu__item-descr">
+  //              ${title} - ${descr}
+  //           </div>
+  //           <div class="menu__item-divider"></div>
+  //           <div class="menu__item-price">
+  //             <div class="menu__item-cost">Цена:</div>
+  //             <div class="menu__item-total"><span>${price}</span> руб/день</div>
+  //           </div>
+  //   `;
+  //     document.querySelector(".menu .container").append(element);
+  //   });
+  // }
+
+  // new MenuCard(
+  //   "img/tabs/vegy.jpg",
+  //   'Меню "Фитнес"',
+  //   "vegy",
+  //   "это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Этоабсолютно новый продукт с оптимальной ценой и высоким качеством!",
+  //   15,
+  //   ".menu .container",
+  //   "menu__item"
+  // ).render();
+
+  // new MenuCard(
+  //   "img/tabs/elite.jpg",
+  //   'Меню "Премиум"',
+  //   "elite",
+  //   "мы используем не только красивый дизайн упаковки,но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!",
+  //   20,
+  //   ".menu .container",
+  //   "menu__item"
+  // ).render();
+
+  // new MenuCard(
+  //   "img/tabs/post.jpg",
+  //   'Меню "Постное"',
+  //   "post",
+  //   "это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля,овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.",
+  //   10,
+  //   ".menu .container",
+  //   "menu__item"
+  // ).render();
 
   // POST request XMLHttpRequest
 
